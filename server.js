@@ -9,7 +9,7 @@ const async = require("async")
 const mongoose = require("mongoose");
 const cheerio = require("cheerio")
 const request = require("request")
-
+const ModelBlog = require("./model/blog")
 const io = require("socket.io")(server)
 
 require("./modulos/io")(io)
@@ -52,8 +52,8 @@ app.get("/blogs", function(res, res, next){
 		console.log("busca y envia")	
 		articulo.buscar().then(function(result){
 			//console.log(actualizado)	
-			//res.render("blogs", {html: result});
-			res.json(result);
+			res.render("blogs", {html: result});
+			//res.json(result);
 		})
 
 	}//callback app.get
@@ -64,19 +64,6 @@ app.get("/blog/:site", function(req, res, next){
 	if (site.slice(0,6) != "http://") {
 		site = "http://" +req.params.site
 	}
-	//if (site.slice(0,6) == "www.") { site = site.slice(4,site.length)}
-
-	/*buscar_articulos.articulos_antiguos(site).then(function(result){
-		console.log(result)
-		res.send(result);
-	})*/
-	/* 
-	debianhackers.net/ ".post-title a", ".posted-on a time"
-	blog.capacityacademy.com/ ".entry-title a", ".entry-meta time"
-	http://www.securitybydefault.com/ ".entry-title a", ".postmeta .clock"
-	http://www.elclubdelprogramador.com/ "entry-title a", ".meta-date time"
-	www.dragonjar.org/ ".et-description h2 a", ".post-meta span"
-	*/
 	console.log(site)
 	request(site, function(err, response){
 		if (err) {
@@ -110,7 +97,21 @@ app.get("/addblog", function (req, res, next) {
 server.listen(8080, function(){
 	console.log("Corriento en http://apacheandnode.com:8080/blogs")
 	console.log("Verificando blogs");
-	var array = 
+
+	var query = ModelBlog.find({})
+	query.select('site tag_title tag_link_article tag_date')
+	query.exec(function(err, result){
+		//console.log(result)
+		async.map(result, 
+			function (result, callback) {
+				articulo.inicia(result, callback)
+			}, 
+			function(err, result){
+				console.log("Blogs Actuzalizados")
+			}
+		)
+	})
+	/*var array = 
 	[
 			["http://www.flaviocorpa.com/","ol li", "h2", ".posts li a", ".post.meta time"],
 			["http://debianhackers.net/", ".post-header", "h1 a"],
@@ -134,11 +135,7 @@ server.listen(8080, function(){
 			["http://elrinconde.miguelra.com/articulos/", ".post-content .entry-title"],
 			["http://blog.koalite.com/archive/", ".post-list li"],
 			["http://www.dbigcloud.com/", ".article-header.clearfix"]
-	]
-	async.map(array, function (array, callback) {
-		articulo.inicia(array, callback)
-	}, function(err, result){
-		console.log("Blogs Actuzalizados")
-	})
+	]*/
+
 
 })

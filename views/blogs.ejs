@@ -24,8 +24,16 @@
 	<div id="container">
 		<%	for(i = 0; i< html.length; i++){%>
 		<div id="" class="blogs">
-			<header> <%= html[i].site %></header>
-			<%- html[i].content %>
+			<header> 
+			<a href="http://<%- html[i].site %>">
+				<%= html[i].site %>				
+			</a>
+			</header>			
+			<h2> 
+			<a href="<%- html[i].link_article %>">
+				<%= html[i].title %>				
+			</a>
+			</h2>
 		</div>
 		
 		<% } %>

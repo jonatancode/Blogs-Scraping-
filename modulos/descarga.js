@@ -16,12 +16,8 @@ exports.buscar = function(){
 	return promise
 }
 
-
-exports.busca_primer_articulo = function (response, callback) {
-	console.log(response[0].request.uri.hostname)
-}
-
 exports.inicia = function (array, callback) {
+	console.log(array)
 	async.waterfall(
 		[
 			function (callback){
@@ -36,6 +32,7 @@ exports.inicia = function (array, callback) {
 			}
 		], 
 		function(err, result){
+			//console.log(result)
 			callback(null, result)
 	});
 	//callback(null, null)
@@ -43,10 +40,16 @@ exports.inicia = function (array, callback) {
 
 
 function get_html (site,callback){
-	console.log(site[0])
-	request(site[0],function(err, response){
+	//console.log("get_html "+ site[0])
+	console.log(site.site)
+	if (site.site.slice(0,4) != "http" ) {
+		site.site = "http://"+site.site
+	}
+	console.log(site.site)
+
+	request(site.site,function(err, response){
 		if (err) { console.log(err)}
-		console.log(response.request.uri.hostname)
+		//console.log(response.request.uri.hostname)
 		callback(null,  response)
 	})
 }
@@ -54,29 +57,29 @@ function get_html (site,callback){
 
 
 function getInfo(array, response_descarga, callback) {
-	console.log("getinfo: "+ array[1])
-	if (response_descarga === null) { callback(null, null) }
-	if (array[1] == "") {
-		response.title = "NUll"
-		callback(null, response_descarga)
-	}
+	//console.log("getinfo: "+ array[1])
 		$ = cheerio.load(response_descarga.body);
 
-		var title = $(array[1]).first().text()
-		var link_article = $(array[2]).first().attr('href')
-		var date = $(array[3]).first().html()
+		var title = $(array.tag_title).first().text()
+		var link_article = $(array.tag_link_article).first().attr('href')
+		console.log(link_article)
+		var date = $(array.tag_date).first().html()
 
 
 		var siteweb = {}
 		siteweb.name = response_descarga.request.uri.hostname
 		siteweb.title = title
+		siteweb.tagtitle = array.tag_title
 		siteweb.link_article = link_article
+		siteweb.tag_link_article = array.tag_link_article
 		siteweb.date = date
+		siteweb.tag_date = array.tag_date
 
 		callback(null, siteweb)
 }
 
 function comprueba(response_getInfo, callback) {
+	//console.log("COMPURBEA "+ response_getInfo.name)
 	ModelBlog.findOne({title: response_getInfo.title}, function(err, data){
 		if (data) {
 			console.log("El articulo ya existe: " +data.site)
@@ -87,7 +90,10 @@ function comprueba(response_getInfo, callback) {
 				site : response_getInfo.name,
 				title : response_getInfo.title,
 				link_article : response_getInfo.link_article,
-				date : response_getInfo.date
+				date : response_getInfo.date,
+				tagtitle : response_getInfo.tagtitle,
+				tag_link_article : response_getInfo.tag_link_article,
+				tag_date : response_getInfo.tag_date
 			})
 			prueba.save(function(err){
 				if (err) { console.log("error")}
@@ -101,7 +107,7 @@ function comprueba(response_getInfo, callback) {
 
 
 exports.promesa = function(data){
-	console.log("promesa "+data)
+	//console.log("promesa "+data)
 	var promise = new Promise(function(resolve, reject){
 		async.waterfall(
 			[
@@ -127,11 +133,33 @@ exports.guarda = function(data){
 				site : response_getInfo.name,
 				title : response_getInfo.title,
 				link_article : response_getInfo.link_article,
-				date : response_getInfo.date
+				date : response_getInfo.date,
+				tagtitle : response_getInfo.tagtitle,
+				tag_link_article : response_getInfo.tag_link_article,
+				tag_date : response_getInfo.tag_date
 			})
 			prueba.save(function(err){
 				if (err) { console.log("error")}
 				console.log("Nuevo articulo añadido a la BD: " +response_getInfo.name)
 				callback(null, response_getInfo)
 			})
+}
+
+
+exports.get_html__getInfo = function (array, callback) {
+	async.waterfall(
+		[
+			function (callback){
+				//console.log(array)
+				get_html(array, callback)
+			},
+			function (response_descarga, callback){
+				getInfo(array, response_descarga,  callback)
+			}
+		], 
+		function(err, result){
+			//console.log(result)
+			callback(null, result)
+	});
+	//callback(null, null)
 }

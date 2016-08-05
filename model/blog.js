@@ -5,7 +5,10 @@ var blog = new Schema({
 	site : String,
 	title : String,
 	date : String,
-	link_article : String
+	link_article : String,
+	tag_title : String,
+	tag_link_article : String,
+	tag_date : String
 })
 
 var objBlog = mongoose.model('blogs', blog);
