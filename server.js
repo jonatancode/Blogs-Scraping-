@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const server = require("http").Server(app)
+
 const path = require('path');
 const articulo = require("./modulos/descarga")
 const buscar_articulos = require("./modulos/buscas")
@@ -8,9 +10,13 @@ const mongoose = require("mongoose");
 const cheerio = require("cheerio")
 const request = require("request")
 
+const io = require("socket.io")(server)
+
+require("./modulos/io")(io)
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/blogs');
 
+app.use( express.static('public'))
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -97,7 +103,11 @@ app.get("/blog/:site", function(req, res, next){
 })
 
 
-app.listen(8080, function(){
+app.get("/addblog", function (req, res, next) {
+	res.render('addblog')
+})
+
+server.listen(8080, function(){
 	console.log("Corriento en http://apacheandnode.com:8080/blogs")
 	console.log("Verificando blogs");
 	var array = 
@@ -129,6 +139,6 @@ app.listen(8080, function(){
 		articulo.inicia(array, callback)
 	}, function(err, result){
 		console.log("Blogs Actuzalizados")
-	})	
+	})
 
 })

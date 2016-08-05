@@ -54,6 +54,7 @@ function get_html (site,callback){
 
 
 function getInfo(array, response_descarga, callback) {
+	console.log("getinfo: "+ array[1])
 	if (response_descarga === null) { callback(null, null) }
 	if (array[1] == "") {
 		response.title = "NUll"
@@ -62,8 +63,8 @@ function getInfo(array, response_descarga, callback) {
 		$ = cheerio.load(response_descarga.body);
 
 		var title = $(array[1]).first().text()
-		var link_article = $(array[1]).first().attr('href')
-		var date = $(array[2]).first().html()
+		var link_article = $(array[2]).first().attr('href')
+		var date = $(array[3]).first().html()
 
 
 		var siteweb = {}
@@ -96,4 +97,41 @@ function comprueba(response_getInfo, callback) {
 			
 		}
 	})
+}
+
+
+exports.promesa = function(data){
+	console.log("promesa "+data)
+	var promise = new Promise(function(resolve, reject){
+		async.waterfall(
+			[
+				function (callback){
+					//console.log(array)
+					get_html(data, callback)
+				},
+				function (response_descarga, callback){
+					getInfo(data, response_descarga,  callback)
+				},
+
+			], 
+			function(err, result){
+				resolve(result)
+		});
+	})
+	return promise
+}
+
+
+exports.guarda = function(data){
+			var prueba = new ModelBlog({
+				site : response_getInfo.name,
+				title : response_getInfo.title,
+				link_article : response_getInfo.link_article,
+				date : response_getInfo.date
+			})
+			prueba.save(function(err){
+				if (err) { console.log("error")}
+				console.log("Nuevo articulo añadido a la BD: " +response_getInfo.name)
+				callback(null, response_getInfo)
+			})
 }
