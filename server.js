@@ -24,28 +24,6 @@ app.set('view engine', 'ejs');
 app.get("/", function(req, res,next){
 	res.send("HOla MUndo")
 })
-app.get("/contacto", function(req, res,next){
-	console.log(req.route);
-	var options ={
-		root : __dirname + '/',
-		dotfiles : 'deny',
-		headers : {
-			'x-timestamp': Date.now(),
-        	'x-sent': true
-		}
-
-	}
-	res.sendFile( "contacto.html", options, function(err){
-		if (err) {
-			console.log(err);
-			res.status(err.status).end()
-		}else{
-			console.log("enviado")
-
-		}
-	});
-	//res.send("Contacto")
-})
 
 
 app.get("/blogs", function(res, res, next){

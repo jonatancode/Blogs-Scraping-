@@ -40,13 +40,13 @@ socket.on("respuesta_request", function(data){
 	document.getElementById("blog_preview__date").innerHTML = "Fecha: "+data.date;
 
 
-	site_web.site = data.name,
-	site_web.title = data.title,
-	site_web.link_article = data.link_article,
-	site_web.date = data.date,
-	site_web.tagtitle = data.tagtitle,
-	site_web.tag_link_article = data.tag_link_article,
-	site_web.tag_date = data.tag_date
+	site_web.site = data[0].name,
+	site_web.title = data[0].title,
+	site_web.link_article = data[0].link_article,
+	site_web.date = data[0].date,
+	site_web.tagtitle = data[0].tagtitle,
+	site_web.tag_link_article = data[0].tag_link_article,
+	site_web.tag_date = data[0].tag_date
 })
 
 function guardar_datos(){
