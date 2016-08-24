@@ -6,6 +6,7 @@ var article = new Schema({
 	title : String,
 	date : String,
 	link_article : String
+
 })
 
 var objBlog = mongoose.model('data_articles', article);

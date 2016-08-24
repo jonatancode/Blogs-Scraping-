@@ -6,7 +6,6 @@ window.addEventListener('load', function () {
 
 	var addblog = document.getElementById("addblog")
 	addblog.addEventListener("click", guardar_datos, false)
-
 }, false)
 
 function envia_datos(e){
@@ -21,9 +20,10 @@ function envia_datos(e){
 		tag_link_article :tag_link,
 		tag_date :tag_date
 	}
+	document.getElementById("respuesta_servidor").innerHTML ="...";
 	socket.emit("datos_sitio_web", objeto)
 }
-var socket = io.connect("http://192.168.1.9:8080")
+var socket = io.connect("http://192.168.1.9:5000")
 var site_web = {
 
 }
@@ -34,10 +34,10 @@ socket.on("mensaje", function(data){
 
 socket.on("respuesta_request", function(data){
 	console.log(data)
-	document.getElementById("blog_preview__site").innerHTML = "Sitio web: "+data.name;
-	document.getElementById("blog_preview__title").innerHTML = "Titulo articulo: "+data.title;
-	document.getElementById("blog_preview__link").innerHTML = "Link articulo: "+data.link_article;
-	document.getElementById("blog_preview__date").innerHTML = "Fecha: "+data.date;
+	document.getElementById("blog_preview__site").innerHTML = "Sitio web: "+data[0].name;
+	document.getElementById("blog_preview__title").innerHTML = "Titulo articulo: "+data[0].title;
+	document.getElementById("blog_preview__link").innerHTML = "Link articulo: "+data[0].link_article;
+	document.getElementById("blog_preview__date").innerHTML = "Fecha: "+data[0].date;
 
 
 	site_web.site = data[0].name,
@@ -56,5 +56,6 @@ function guardar_datos(){
 
 socket.on("datos_guardados_OK", function(data){
 	/* muestar mensaje*/
+	document.getElementById("respuesta_servidor").innerHTML = "..."
 	document.getElementById("respuesta_servidor").innerHTML = "BLOG GUARDADO CORRECTAMENTE"
 })

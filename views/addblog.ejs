@@ -3,42 +3,49 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+	<script type="text/javascript" src="/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/jquery"></script>
+
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="/js/addblog.js"></script>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	
 </head>
 <body>
-	<h1>ADDblog</h1>
 
-	<div id="content">
-		<div class="blog">
+	<div class="container">
+		<h1>ADDblog</h1>
+		<div class="blog form-inline">
 			<label for="site">Sitio web</label>
-				<input type="text" name="site" id="site">
+				<input type="url" name="site" id="site" placeholder="http://exemple.com" class="form-control url text">
 			<label for="tag-title">Etiqueta titulo</label>
-				<input type="text" name="tag-title" id="tag-title">			
+				<input type="text" name="tag-title" id="tag-title" class="form-control">			
 			<label for="tag-link">Etiqueta link</label>
-				<input type="text" name="tag-link" id="tag-link">			
+				<input type="text" name="tag-link" id="tag-link" class="form-control">			
 			<label for="tag-date">Etiqueta date</label>
-				<input type="text" name="tag-date" id="tag-date">
-			<label for="preview_blog">preview blog</label>
-				<input type="submit" name="preview_blog" id="preview_blog">
+				<input type="text" name="tag-date" id="tag-date" class="form-control">
+
+			<button type="submit" name="preview_blog" id="preview_blog" class="btn btn-default">Probando</button>
 		</div>
 
 		<div id="blog_preview">
 			<div id="blog_preview__site">
-				<p class="content"></p>
+				<p class="content lead "></p>
 			</div>
 			<div id="blog_preview__title">
-				<p class="content"></p>
+				<p class="content lead "></p>
 			</div>
 			<div id="blog_preview__link">
-				<p class="content"></p>
+				<p class="content lead "></p>
 			</div>
 			<div id="blog_preview__date">
-				<p class="content"></p>
+				<p class="content lead "></p>
 			</div>
 		</div>
-		<label for="addblog">Añdir blog</label>
-			<input type="submit" name="addblog" id="addblog">
+		<button type="submit" name="addblog" id="addblog" class="btn btn-primary">Añadir BLog</button>
 		<div id="respuesta_servidor">
 		</div>
 	</div>

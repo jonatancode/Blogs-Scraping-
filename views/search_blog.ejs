@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+	<script type="text/javascript" src="/js/bootstrap.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/blogs.css">
+	<script type="text/javascript" src="/jquery"></script>
+	
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+			<h2 class="text-primary text-center"><a href="<%= web[0].site %>"><%= web[0].site %></a></h2>	
+			<a href="/blogs">
+				<button type="button" class="btn btn-info" >
+					<span class="glyphicon glyphicon glyphicon-home"></span>
+				</button>
+			</a>
+
+		</div>	
+		<div class="row">
+		<% for(var i = 0 ; i< web.length ; i++){%>
+			<div class="col-md-3 well well-lg">
+				<p class="lead text-center">
+					<a href="<%- web[i].link_article %>">
+					<%= web[i].title %>				
+					</a>
+				</p>				
+				<div class="btn-group btn-group-lg">
+					<p class="text-info"> 
+						<a href="<%- web[i].site %>"><%= web[i].site %></a> 
+					</p>		
+				</div>
+			</div>
+			<% if(i  % 4 == 0){%>
+		</div>
+		<div class="row">
+			<% } %>
+		<% } %>
+	</div>
+</body>	
+</html>

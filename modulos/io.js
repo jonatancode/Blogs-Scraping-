@@ -19,6 +19,9 @@ module.exports = function(io){
 		*/
 
 		socket.on("guardar_datos", function(data){
+			if (data.site.slice(0,4) != "http" ) {
+				data.site = "http://"+data.site
+			}
 			var prueba = new ModelBlog({
 				site : data.site,
 				title : data.title,
@@ -35,6 +38,27 @@ module.exports = function(io){
 
 
 			})
+		})
+
+		/*
+				ACTUALIZA BASE DE DATOS
+		*/
+		socket.on("actualiza", function(err){
+			var query = ModelBlog.find({})
+			query.select('site tag_title tag_link_article tag_date')
+			query.exec(function(err, result){
+				//console.log(result)
+				async.map(result, 
+					function (result, callback) {
+						articulos.inicia(result, callback)
+					}, 
+					function(err, result){
+						console.log("Blogs Actuzalizados")
+						//console.log(result)
+						socket.emit("actuzalidado", {datos: result})
+					}
+				)
+			})		
 		})
 	})
 }
