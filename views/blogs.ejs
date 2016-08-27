@@ -58,13 +58,13 @@
 							<div class="col-md-3 well">
 								<p class="lead text-center">
 									<a href="<%- html[i].link_article %>">
-									<%= html[i].title %>				
+									<%= html[i][0].title %>				
 									</a>
 			
 								</p>				
-								<a href="<%- html[i].site %>"><%= html[i].site %></a> 
+								<a href="<%- html[i][0].site %>"><%= html[i][0].site %></a> 
 								<% 
-									var n = html[i].site 
+									var n = html[i][0].site 
 									n = n.slice(7,n.length)
 								%> 
 								<a href="/search/<%=n %>">

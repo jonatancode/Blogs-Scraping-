@@ -1,24 +1,26 @@
 const Blogs = function(){
 	this.lista = []
-	this.tamano = 0
-	this.settamano = function(tamano){
-		this.tamano = tamano
-	}
-	this.gettamano = function(){
-		return this.tamano
-	}
-	this.length_lista = function(){
-		return this.lista.length
-	}
-	this.addblog = function(blog){
+	this.max_id_entrada = 0
+	this.max_id_site_web = 0
+	this.nuevos_blogs = []
+
+	this.addblog = (blog) =>{
 		this.lista.push(blog)
+		this.max_id_site_web++
 	}
-	this.get = function(){
-		return this.lista
+	this.new_blog = (blog) =>{ 
+		this.lista.push()
+		this.nuevos_blogs.push(blog.id)
+		this.max_id_site_web++
 	}
-	this.removeblog = function(id){
-	}
-	this.get_blog  = function(name_site){
+	this.nuevos = ()=> this.nuevos_blogs
+	this.get_lista = ()=> this.lista
+	this.get_len_lista =  () => this.lista.length
+
+	this.get_max_id_entrada = () => this.max_id_entrada
+	this.get_max_id_site_web = () => this.max_id_site_web
+	
+	this.search  = (name_site) => {
 		for (var i = 0; i < this.lista.length; i++) {
 			
 			if (this.lista[i].name == name_site) {
@@ -26,7 +28,8 @@ const Blogs = function(){
 			}
 		}
 	}	
-	this.get_blog_for_id  = function(id_site){
+
+	this.search_id  = (id_site) => {
 		for (var i = 0; i < this.lista.length; i++) {
 			
 			if (this.lista[i].id == id_site) {
@@ -34,18 +37,34 @@ const Blogs = function(){
 			}
 		}
 	}
-	this.vacio = function(){
-		v = this.lista.length
-		if (v == 0) {
-			return true
+	
+	this.vacio = () => this.lista.length == 0
+
+	this.removeblog = function(id){
+	}
+	
+	this.info = () => {
+		return {lista: this.lista.length, maxE: this.max_id_entrada, MaxS: this.max_id_site_web}
+	}
+	this.length_entradas = ()=>{
+		var n = 0
+		for (var i = 0; i < this.lista.length; i++) {
+			var length_blog = this.lista[i].length_entradas()
+			n = n + length_blog
+			if (i ==this.lista.length -1) {
+				return n 
+			}
 		}
-		return false
 	}
-	this.first = function(){
-		return this.lista[0]
-	}
-	this.get_all_blogs = function(){
-		return this.lista
+	this.actualizar_valor_entradas = () =>{
+		var n = 0
+		for (var i = 0; i < this.lista.length; i++) {
+			var length_blog = this.lista[i].length_entradas()
+			n = n + length_blog
+			if (i ==this.lista.length -1) {
+				this.max_id_entrada=  n 
+			}
+		}	
 	}
 }
 

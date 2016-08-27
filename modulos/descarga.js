@@ -3,6 +3,8 @@ const cheerio = require("cheerio")
 const async = require("async")
 const ModelBlog = require("../model/blog")
 const datas_articles = require(("../model/datos_articulos"))
+
+const Entrada = require(("./entrada"))
 /*
 		 BUSCA TODOS LOS BLOGS
 */
@@ -201,5 +203,4 @@ function comprueba(response_getInfo, callback) {
 		}
 	})
 }
-
 

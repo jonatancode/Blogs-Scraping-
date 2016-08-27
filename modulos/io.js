@@ -2,12 +2,20 @@ const async = require("async")
 const articulos = require("./descarga")
 const ModelBlog = require("../model/blog")
 
-module.exports = function(io){
+
+const Siteweb = require("./siteweb")
+const Entrada = require("./entrada")
+
+const Funciones = require("./funciones")
+
+
+module.exports = function(io, blogs){
 	io.on('connection', function(socket){
 		console.log("Alguien COnectado")
 		socket.emit("mensaje", {hola: "jonatan"})
 
 		socket.on("datos_sitio_web", function(data){
+			console.log(data)
 			articulos.get_html__getInfo(data, function(err, result){
 					//console.log("result callback "+result)
 					socket.emit("respuesta_request", result)
@@ -19,7 +27,36 @@ module.exports = function(io){
 		*/
 
 		socket.on("guardar_datos", function(data){
-			if (data.site.slice(0,4) != "http" ) {
+			/*
+				GUARDAR EN EL OBJETO
+			*/
+			var lasted_id = blogs.get_max_id_site_web()
+			var new_blog = new Siteweb(lasted_id+1, data.site, data.tagtitle, data.tag_link_article, data.tag_date)
+			blogs.new_blog(new_blog)
+
+			var request = Funciones.request(new_blog)
+
+			request.then(function(result){
+				console.log("request")
+				Funciones.buscar_entradas(result, new_blog)
+					.then(function(result){
+						var id_lastesd =  blogs.get_max_id_entrada()
+						Funciones.añadir_entrada(result, id_lastesd, new_blog)
+						console.log("Entradas:", blogs.get_max_id_entrada())
+						console.log("SItio:",blogs.get_max_id_site_web())
+						console.log(new_blog.info())
+						socket.emit("datos_guardados_OK", {res: "OK"})
+					})
+			})
+			//console.log(blogs.vacio())
+			/*
+			http://www.caceriadespammers.com.ar/
+			.post-title.entry-title
+			.post-title.entry-title a
+			.date-header
+			*/
+			//id, name, tag_title, tag_link, tag_date){
+			/*if (data.site.slice(0,4) != "http" ) {
 				data.site = "http://"+data.site
 			}
 			var prueba = new ModelBlog({
@@ -37,7 +74,7 @@ module.exports = function(io){
 				socket.emit("datos_guardados_OK", {res: "OK"})
 
 
-			})
+			})*/
 		})
 
 		/*
