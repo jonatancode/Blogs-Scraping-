@@ -1,101 +1,69 @@
 const async = require("async")
-const articulos = require("./descarga")
-const ModelBlog = require("../model/blog")
-
 
 const Siteweb = require("./siteweb")
-const Entrada = require("./entrada")
 
 const Funciones = require("./funciones")
 
+/* 
+	Antes de guardar en el objeto Blogs = All_Blogs
+*/
+var new_sitio = ""
 
-module.exports = function(io, blogs){
+module.exports = function(io, Blogs){
 	io.on('connection', function(socket){
 		console.log("Alguien COnectado")
 		socket.emit("mensaje", {hola: "jonatan"})
 
 		socket.on("datos_sitio_web", function(data){
-			console.log(data)
-			articulos.get_html__getInfo(data, function(err, result){
-					//console.log("result callback "+result)
-					socket.emit("respuesta_request", result)
+			//console.log(data)
+			var lasted_id = Blogs.get_max_id_site_web()
+			new_sitio = ""
+			new_sitio = new Siteweb(lasted_id+1, data.site, data.tag_title, data.tag_link, data.tag_date)
+			new_sitio.actualizar_request()
+			 .then(function(result){
+				var ultimo = new_sitio.get_lasted_article()
+				console.log("despues de descargar")
+				console.log(new_sitio.id)
+				new_sitio.request_body = new_sitio.new_request_
+
+				//console.log(new_sitio)
+				socket.emit("respuesta_request", ultimo[0])
+				
 			})
 		})
 
-		/*
-		 GUARDA DATOS DEL BLOG
-		*/
-
-		socket.on("guardar_datos", function(data){
-			/*
-				GUARDAR EN EL OBJETO
-			*/
-			var lasted_id = blogs.get_max_id_site_web()
-			var new_blog = new Siteweb(lasted_id+1, data.site, data.tagtitle, data.tag_link_article, data.tag_date)
-			blogs.new_blog(new_blog)
-
-			var request = Funciones.request(new_blog)
-
-			request.then(function(result){
-				console.log("request")
-				Funciones.buscar_entradas(result, new_blog)
-					.then(function(result){
-						var id_lastesd =  blogs.get_max_id_entrada()
-						Funciones.añadir_entrada(result, id_lastesd, new_blog)
-						console.log("Entradas:", blogs.get_max_id_entrada())
-						console.log("SItio:",blogs.get_max_id_site_web())
-						console.log(new_blog.info())
-						socket.emit("datos_guardados_OK", {res: "OK"})
-					})
+		socket.on("guardar_datos", function(){
+			let id_site = new_sitio.id
+			let id_entrada = Blogs.max_id_entrada
+			new_sitio.all_get_articles(id_site, id_entrada)
+			 .then(function(array){
+			 	console.log(array.length)
+				Blogs.new_blog(new_sitio)
+				new_sitio.save_articulo(Blogs, array, socket)
+				//socket.emit("datos_guardados_OK", {res: "OK"})
+				
 			})
-			//console.log(blogs.vacio())
-			/*
-			http://www.caceriadespammers.com.ar/
-			.post-title.entry-title
-			.post-title.entry-title a
-			.date-header
-			*/
-			//id, name, tag_title, tag_link, tag_date){
-			/*if (data.site.slice(0,4) != "http" ) {
-				data.site = "http://"+data.site
-			}
-			var prueba = new ModelBlog({
-				site : data.site,
-				title : data.title,
-				link_article : data.link_article,
-				date : data.date,
-				tag_title : data.tagtitle,
-				tag_link_article : data.tag_link_article,
-				tag_date : data.tag_date
-			})
-			prueba.save(function(err){
-				if (err) { console.log("error")}
-				console.log("Nuevo articulo añadido a la BD: "+ data.site )
-				socket.emit("datos_guardados_OK", {res: "OK"})
 
-
-			})*/
+			
 		})
 
 		/*
 				ACTUALIZA BASE DE DATOS
 		*/
-		socket.on("actualiza", function(err){
-			var query = ModelBlog.find({})
-			query.select('site tag_title tag_link_article tag_date')
-			query.exec(function(err, result){
-				//console.log(result)
-				async.map(result, 
-					function (result, callback) {
-						articulos.inicia(result, callback)
-					}, 
-					function(err, result){
-						console.log("Blogs Actuzalizados")
-						//console.log(result)
-						socket.emit("actuzalidado", {datos: result})
-					}
-				)
-			})		
+
+		socket.on("actualiza", function(data){	
+
+			Funciones.actualizar(Blogs).then(function(){
+			 	socket.emit("res_actuzaliza")
+			 })
+
+		})
+
+		socket.on("save", function(){
+			Funciones.save(Blogs)
+				socket.emit("res_save", {res: "OK"})
+				
+
 		})
 	})
 }

@@ -1,0 +1,59 @@
+Clase Blogs
+	this.lista = []
+	this.max_id_entrada = 0
+	this.max_id_site_web = 0
+	this.nuevos_blogs = []
+
+Clase Site_web
+ 	this.id = id;
+	this.name = name;
+	this.tag_title = tag_title;
+	this.tag_link = tag_link;
+	this.tag_date =tag_date;
+	this.entradas =  entradas || []
+
+	this.request = "Si hay nuevo contenido crear este atributo"
+
+	/*Metodos de actulizacion*/
+	this.hay_nuevo_contenido = ()=>{
+		Pedir request, crear hash y comparar con el ultimo hash
+			si es diferente conservar el nuevo y guardar el request en el objeto y retornar true
+			si no lo es retornar false
+	}
+
+	this.get_lasted_article = ()=>{
+		retornar el ultimo articulo
+	}
+
+	this.exite_articulo = ()=>{
+		recorre todos los articulos para comprobar y existe 
+		// como hay_nuevo_contenido() es true podemos deducir que no existe
+	}
+
+	this.save_articulo = (blogs)=>{
+		recibe el objeto padre, para poder aumentar en 1 el atributo "max_id_entrada" y este sera el id del articulo
+		guardar articulo
+	}
+
+
+	this.guardar
+
+
+MongoDB
+
+EL objeto blogs contiene site_web
+
+	{
+	    "_id" : ObjectId("57c181128e91110229f18a02"),
+	    "id" : 1,
+	    "site" : "http://nebul4ck.wordpress.com",
+	    "tag_title" : "h2",
+	    "tag_link" : "h2 a",
+	    "tag_date" : ".entry-meta a",
+	    "entradas" : [],
+	    "__v" : 0
+	    #AÑADIR EL ULTIMO REQUEST Y CREAR UN HASH UNICO, AL ACTUALIZAR SOLO COMPARAMOS LOS HASH PARA 
+	    # VERIFICAR SI HAY NUEVO CONTENIDO
+	    "hash_request" : 123123123123123,
+	    "lasted_request" : asdaskldjalksdjnakd,
+	}

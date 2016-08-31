@@ -3,19 +3,26 @@ const Blogs = function(){
 	this.max_id_entrada = 0
 	this.max_id_site_web = 0
 	this.nuevos_blogs = []
-
+	/*
+		Se utiliza en la carga del sitio web
+	*/
 	this.addblog = (blog) =>{
 		this.lista.push(blog)
-		this.max_id_site_web++
+		if (blog.id > this.max_id_site_web) {
+			this.max_id_site_web = blog.id
+		}
 	}
+	/*
+	ESta funcion se utiliza para ñadir un blog
+	*/
 	this.new_blog = (blog) =>{ 
-		this.lista.push()
-		this.nuevos_blogs.push(blog.id)
+		this.lista.push(blog)
 		this.max_id_site_web++
+		this.nuevos_blogs.push(blog.id)
 	}
 	this.nuevos = ()=> this.nuevos_blogs
+
 	this.get_lista = ()=> this.lista
-	this.get_len_lista =  () => this.lista.length
 
 	this.get_max_id_entrada = () => this.max_id_entrada
 	this.get_max_id_site_web = () => this.max_id_site_web
@@ -40,8 +47,7 @@ const Blogs = function(){
 	
 	this.vacio = () => this.lista.length == 0
 
-	this.removeblog = function(id){
-	}
+
 	
 	this.info = () => {
 		return {lista: this.lista.length, maxE: this.max_id_entrada, MaxS: this.max_id_site_web}
@@ -62,9 +68,19 @@ const Blogs = function(){
 			var length_blog = this.lista[i].length_entradas()
 			n = n + length_blog
 			if (i ==this.lista.length -1) {
-				this.max_id_entrada=  n 
+				this.max_id_entrada =  n 
 			}
 		}	
+	}
+	this.get_all_url = ()=>{
+		var url = []
+		for (var i = 0; i < this.lista.length; i++) {
+			var name = this.lista[i].name
+			url.push(name)
+			if (i == this.lista.length -1) {
+				return url
+			}
+		}
 	}
 }
 

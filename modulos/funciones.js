@@ -1,150 +1,71 @@
 const Siteweb = require("./siteweb")
-const Entrada = require("./entrada")
 
-const ModelBlog = require("../model/blog")
+const ModelContenido = require("../model/contenido")
+
 exports.cargaSitio = function  (blogs){
 	var promise = new Promise(function(resolve, reeject){
-		var query = ModelBlog.find({})
-		query.select('site tag_title tag_link_article tag_date')
+		var query = ModelContenido.find({})
 		query.exec(function(err, result){
 			var sitios_webs = result.map(function(sitio, index, array){
-				var new_sitio = new Siteweb(index+1, sitio.site, sitio.tag_title, sitio.tag_link_article, sitio.tag_date)
+				let hash = sitio.hash_request.toString()
+				var new_sitio = new Siteweb(sitio.id, sitio.site, sitio.tag_title, sitio.tag_link, sitio.tag_date, hash ,sitio.entradas)
+				// Actuzalizamos el request
+				new_sitio.actualizar_request()
+				.then(function(result){
+					let new_hash_code = new_sitio.generateHashCode()
+					if (new_hash_code == new_sitio.hash_request) {
+						console.log("NO hay nuevos datos")
+					}
+					else{
+						let lasted_article = new_sitio.get_lasted_article()
+						new_sitio.save_articulo(lasted_article)
+					}
+				})
+
+
 				blogs.addblog(new_sitio)
+
 				if (index == array.length-1){
-					console.log(sitio.tag_link_article)
-					resolve()
-				}
-			})
-		})
-
-	})
-	return promise
-}
-
-const articulos = require("../model/datos_articulos")
-exports.cargarEntradas = function (blogs){
-	var promise = new Promise(function(resolve, reeject){
-		var query = articulos.find({})
-		query.exec(function(err, result){
-			var entradas = result.map(function(rentrada, index, array){
-
-				var entrada = new Entrada(index+1, rentrada.title, rentrada.link_article, rentrada.site)
-				site_web = blogs.search(rentrada.site)
-				site_web.addentradas(entrada)
-				//console.log(entrada)
-				if (index == array.length -1){
-					// Actualizar el valor de la las entradas this.max_id_entrada = 0
 					blogs.actualizar_valor_entradas()
+					//console.log(new_sitio)
 					resolve()
 				}
-
 			})
-		})	
-		
+		})
+
 	})
 	return promise
 }
 
-const request = require("request")
-exports.request = function(blog){
-	var name = blog.name
-	var promise = new Promise(function(resolve, reeject){
-		console.log(name)
-		request(name,function(err, response){
-			if (err) { console.log(err)}
-			resolve(response)
-		})
-		
+exports.actualizar = function(Blogs){
+	var promesa = new Promise(function(resolve, reeject){
+		var all_blogs = Blogs.get_lista()
+		for (var i = 0; i < all_blogs.length; i++) {
+			console.log("ACTUALIZANDO...", i)
+			all_blogs[i].actualizar_request().then(function(result){
+				if ( result == "stop"){
+					console.log("No hay nuevo contenido\nSitio: ", all_blogs[i].id)
+
+				}else{
+					//console.log("Hay nuevo contenido")
+					var new_entrada = all_blogs[i].get_lasted_article()
+					all_blogs[i].save_articulo(Blogs, new_entrada)
+				}
+			})
+			 if (i == all_blogs.length -1 ) {
+				console.log("Fin de la actulizacion")
+			 	resolve()
+			 }
+		}	
 	})
-	return promise
+	return promesa
+	
 }
 
-const cheerio = require("cheerio")
-exports.buscar_entradas = function(request,blog){
-	console.log("BUscar entradas")
-	var tag_title = blog.tag_title
-	var tag_link = blog.tag_link
-	var tag_date = blog.tag_date
-	var promise = new Promise(function(resolve, reeject){
 
-		$ = cheerio.load(request.body);
-
-		var array_title = []
-		$(tag_title).each(function(i, elem) {
-  			array_title[i] = $(this).text();
-		});
-		
-		
-		var array_link_article = []
-		$(tag_link).each(function(i, elem){
-			array_link_article[i] = $(this).attr("href")
-		})
-		//console.log(array_link_article)
-
-		var array_date =[]
-		$(tag_date).each(function(i, elem){
-			array_date[i] = $(this).text()
-		})
-
-		var array_article = []
-
-		for (var i = 0; i < array_title.length; i++) {
-			var siteweb = {}
-			siteweb.title = array_title[i]
-			siteweb.link_article = array_link_article[i]
-			siteweb.date = array_date[i]
-			array_article.push(siteweb)
-			if (i == array_title.length -1) {
-  				//console.log(array_article)
-				resolve(array_article)
-
-			}
-		}
-	})
-	return promise
-
-}
-
-exports.añadir_entrada = function(array, id, blog){
-	var lasted_id = id
-	for (var i = 0; i < array.length; i++) {
-		var entrada  = new Entrada(lasted_id, array[i].title, array[i].link_article, array[i].date)
-		blog.addentradas(entrada)
-		lasted_id++
+exports.save = function(Blogs){
+	var sitios = Blogs.get_lista()
+	for (var i = 0; i < sitios.length; i++) {
+		sitios[i].save()
 	}
-	console.log(blog.id)
 }
-
-
-exports.guardar_nuevos = function(blog){
-	var nuevos = blog.nuevos()
-	for (let elem of nuevos){
-		var Oblog = blog.search_id(elem)
-		console.log(Oblog)
-	}
-
-}
-
-const NewCOllections = require("../model/contenido.js")
-
-exports.exportar_a = function(blogs){
-	//console.log(blogs.search_id(1))
-	for (var i = 0; i < blogs.lista.length; i++) {
-			var primer_blog = blogs.lista[i]
-		var probando = new NewCOllections({
-			site : primer_blog.name,
-			tag_title : primer_blog.tag_title,
-			tag_link : primer_blog.tag_link,
-			tag_date : primer_blog.tag_date,
-			entradas : primer_blog.entradas
-		})
-		probando.save(function (err,data) {
-			if(err){
-				return console.log(err)
-			}
-			console.log(data)
-		})
-	}
-	//console.log(blog.search_id(1))
-}
-
