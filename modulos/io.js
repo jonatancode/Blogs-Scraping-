@@ -9,46 +9,44 @@ const Funciones = require("./funciones")
 */
 var new_sitio = ""
 
+const EventEmitter = require('events');
+
+class MyEmitter extends EventEmitter {}
+
+const myEmitter = new MyEmitter();
+
+
 module.exports = function(io, Blogs){
 	io.on('connection', function(socket){
 		console.log("Alguien COnectado")
 		socket.emit("mensaje", {hola: "jonatan"})
 
 		socket.on("datos_sitio_web", function(data){
-			//console.log(data)
-			var lasted_id = Blogs.get_max_id_site_web()
+			
 			new_sitio = ""
-			new_sitio = new Siteweb(lasted_id+1, data.site, data.tag_title, data.tag_link, data.tag_date)
-			new_sitio.actualizar_request()
-			 .then(function(result){
-				var ultimo = new_sitio.get_lasted_article()
-				console.log("despues de descargar")
-				console.log(new_sitio.id)
-				new_sitio.request_body = new_sitio.new_request_
+			new_sitio = new Siteweb( 0 , data.site, data.tag_title, data.tag_link, data.tag_date)
 
-				//console.log(new_sitio)
-				socket.emit("respuesta_request", ultimo[0])
+			new_sitio.reload_request()
+			 .then(function(){
+				var ultima_entrada = new_sitio.generate_last_entrada()
+				console.log("NUevo sitio")
+				socket.emit("respuesta_request", ultima_entrada)
 				
 			})
 		})
 
-		socket.on("guardar_datos", function(){
-			let id_site = new_sitio.id
-			let id_entrada = Blogs.max_id_entrada
-			new_sitio.all_get_articles(id_site, id_entrada)
-			 .then(function(array){
-			 	console.log(array.length)
-				Blogs.new_blog(new_sitio)
-				new_sitio.save_articulo(Blogs, array, socket)
-				//socket.emit("datos_guardados_OK", {res: "OK"})
-				
-			})
-
+		socket.on("save_new_site", function(){
+			let lasted_id = Blogs.get_max_id_site_web()
+			new_sitio.set_id(lasted_id+1)
+			Blogs.new_site(new_sitio)
+			console.log("Este es el ultimo id", lasted_id)
+			new_sitio.generate_all_entrada()
+			console.log("Entradas generadas", new_sitio.id)
 			
 		})
 
 		/*
-				ACTUALIZA BASE DE DATOS
+				ACTUALIZA
 		*/
 
 		socket.on("actualiza", function(data){	
@@ -58,10 +56,13 @@ module.exports = function(io, Blogs){
 			 })
 
 		})
+		/*
 
+			SAVE ALL DB
+		*/
 		socket.on("save", function(){
 			Funciones.save(Blogs)
-				socket.emit("res_save", {res: "OK"})
+			socket.emit("res_save", {res: "OK"})
 				
 
 		})

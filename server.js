@@ -29,17 +29,14 @@ app.set('view engine', 'ejs');
 
 app.get("/", function(res, res, next){
 	var all_blogs = blogs.get_lista()
-	var ultimas_entradas = []
+	let entradas = []
 	for (var i = 0; i < all_blogs.length; i++) {
-		var ultima_entrada = all_blogs[i].ultima_entrada()
-		ultimas_entradas.push(ultima_entrada)
-		if (i == all_blogs.length-1){
-			console.log(ultimas_entradas[10])
-			//res.render("blogs",{html:ultimas_entradas})
-			res.json({html:ultimas_entradas})
-		}
+		let last_entrada = all_blogs[i].last_entrada()
+		entradas.push(last_entrada)
 	}
-
+	//console.log(entradas[11])
+	res.render("blogs", {html : entradas})
+	//res.json(entradas)
 })
 
 
@@ -48,7 +45,8 @@ app.get("/search/:id", function(req, res, next){
 	var blog = blogs.search_id(id)
 	console.log(blog)
 	var entradas = blog.get_entradas()
-	res.json(entradas)
+	res.render("search_blog",{entradas:entradas})
+	//res.json(entradas)
 })
 
 
@@ -92,12 +90,22 @@ app.get("/prueba", function(req, res, next){
 	res.render("prueba")
 })
 
+app.get("/save", function(req, res, next){
+	funciones.save(blogs)
+	res.send("f")
+})
+
 server.listen(5000, function(){
 	console.log("Corriento en el puerto 5000")
-	if ( blogs.vacio() ) {
-	 	funciones.cargaSitio(blogs).then(function(){
-			console.log("Todo listo")
+	if ( blogs.vacio() ) { 
+	 	funciones.cargaSitio(blogs)
+	 		.then(function(){
+				console.log("Sitio Cargados")
+				funciones.actualizar(blogs)
+					.then(function(){
+						console.log("Sitios Actualizando")
+					})
+			})
 			
-		})
 	}
 })

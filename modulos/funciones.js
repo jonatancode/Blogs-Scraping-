@@ -2,36 +2,46 @@ const Siteweb = require("./siteweb")
 
 const ModelContenido = require("../model/contenido")
 
-exports.cargaSitio = function  (blogs){
+const EventEmitter = require('events');
+
+class MyEmitter extends EventEmitter {}
+
+const myEmitter = new MyEmitter();
+
+myEmitter.on("reload_request", function(obj){
+
+	var new_entrada = obj.generate_last_entrada()
+	var lasted = obj.last_entrada()
+	console.log(obj.id)
+	if (lasted === undefined ){
+		console.log(lasted)
+		obj.generate_all_entrada().then(function(){console.log("guardado")})
+	}
+	else if (lasted.title == new_entrada.title){
+		console.log("NO hay nuevos contenidos")
+	}
+	else if (lasted.title != new_entrada.title){
+		console.log("HAY NUEVO CONTENIDO")
+		obj.add_entrada(new_entrada)
+
+	}
+
+})
+
+myEmitter.on("error_", function(err){
+	console.log(err)
+})
+
+exports.cargaSitio = function  (Blogs){
 	var promise = new Promise(function(resolve, reeject){
 		var query = ModelContenido.find({})
 		query.exec(function(err, result){
-			var sitios_webs = result.map(function(sitio, index, array){
-				let hash = sitio.hash_request.toString()
-				var new_sitio = new Siteweb(sitio.id, sitio.site, sitio.tag_title, sitio.tag_link, sitio.tag_date, hash ,sitio.entradas)
-				// Actuzalizamos el request
-				new_sitio.actualizar_request()
-				.then(function(result){
-					let new_hash_code = new_sitio.generateHashCode()
-					if (new_hash_code == new_sitio.hash_request) {
-						console.log("NO hay nuevos datos")
-					}
-					else{
-						let lasted_article = new_sitio.get_lasted_article()
-						new_sitio.save_articulo(lasted_article)
-					}
-				})
-
-
-				blogs.addblog(new_sitio)
-
-				if (index == array.length-1){
-					blogs.actualizar_valor_entradas()
-					//console.log(new_sitio)
-					resolve()
-				}
+			var sitios = result.map(function(elem, index, array){
+				let sitio = new Siteweb(elem.id, elem.site, elem.tag_title, elem.tag_link, elem.tag_date, elem.request_body, elem.entradas)
+				Blogs.add_site(sitio)
 			})
-		})
+			resolve()
+		})		
 
 	})
 	return promise
@@ -39,33 +49,28 @@ exports.cargaSitio = function  (blogs){
 
 exports.actualizar = function(Blogs){
 	var promesa = new Promise(function(resolve, reeject){
-		var all_blogs = Blogs.get_lista()
-		for (var i = 0; i < all_blogs.length; i++) {
-			console.log("ACTUALIZANDO...", i)
-			all_blogs[i].actualizar_request().then(function(result){
-				if ( result == "stop"){
-					console.log("No hay nuevo contenido\nSitio: ", all_blogs[i].id)
-
-				}else{
-					//console.log("Hay nuevo contenido")
-					var new_entrada = all_blogs[i].get_lasted_article()
-					all_blogs[i].save_articulo(Blogs, new_entrada)
-				}
-			})
-			 if (i == all_blogs.length -1 ) {
-				console.log("Fin de la actulizacion")
-			 	resolve()
-			 }
-		}	
+		let all_blog = Blogs.get_lista()
+		all_blog.map(function(elem, i, array){
+			elem.reload_request(myEmitter)
+		})
+		resolve()
+		
 	})
 	return promesa
-	
 }
 
+
+exports.add_new_entradas = function(Blogs){
+	let all_blog = Blogs.get_lista()
+	all_blog.map(function(elem){
+		//console.log(elem.request_body ? "existe":  "NO hay")
+		var new_entrada = ele
+	})
+}
 
 exports.save = function(Blogs){
 	var sitios = Blogs.get_lista()
 	for (var i = 0; i < sitios.length; i++) {
-		sitios[i].save()
+		sitios[i].save_in_db()
 	}
 }

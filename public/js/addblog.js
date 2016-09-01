@@ -31,7 +31,7 @@ function envia_datos(e){
 }
 
 function guardar_datos(){
-	socket.emit("guardar_datos")
+	socket.emit("save_new_site")
 }
 
 function actualizad(){
@@ -50,10 +50,10 @@ socket.on("mensaje", function(data){
 
 socket.on("respuesta_request", function(data){
 	console.log(data)
-	document.getElementById("blog_preview__site").innerHTML = "Sitio web: "+data[0].site;
-	document.getElementById("blog_preview__title").innerHTML = "Titulo articulo: "+data[0].title;
-	document.getElementById("blog_preview__link").innerHTML = "Link articulo: "+data[0].link_article;
-	document.getElementById("blog_preview__date").innerHTML = "Fecha: "+data[0].date;
+
+	document.getElementById("blog_preview__title").innerHTML = "Titulo articulo: "+data.title;
+	document.getElementById("blog_preview__link").innerHTML = "Link articulo: "+data.link;
+	document.getElementById("blog_preview__date").innerHTML = "Fecha: "+data.date;
 
 })
 
