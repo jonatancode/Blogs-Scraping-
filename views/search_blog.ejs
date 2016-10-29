@@ -17,7 +17,7 @@
 <body>
 	<div class="container">
 		<div class="jumbotron">
-			<h2 class="text-primary text-center"><a href="<%= entradas[0].site %>"><%= entradas[0].site %></a></h2>	
+			<h2 class="text-primary text-center"><a href="<%= site %>"><%= site %></a></h2>	
 			<a href="/">
 				<button type="button" class="btn btn-info" >
 					<span class="glyphicon glyphicon glyphicon-home"></span>
@@ -29,13 +29,13 @@
 		<% for(var i = 0 ; i< entradas.length ; i++){%>
 			<div class="col-md-3 well well-lg">
 				<p class="lead text-center">
-					<a href="<%- entradas[i].link_article %>">
+					<a href="<%= entradas[i].link %>">
 					<%= entradas[i].title %>				
 					</a>
 				</p>				
 				<div class="btn-group btn-group-lg">
 					<p class="text-info"> 
-						<a href="<%- entradas[i].site %>"><%= entradas[i].site %></a> 
+						<a href="<%= entradas[i].site %>"><%= entradas[i].site %></a> 
 					</p>		
 				</div>
 			</div>

@@ -42,7 +42,7 @@ function save_all_data(){
 	socket.emit("save")
 }
 
-var socket = io.connect("http://192.168.1.9:5000")
+var socket = io.connect("localhost:5000")
 
 socket.on("mensaje", function(data){
 	console.log(data.hola)

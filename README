@@ -1,7 +1,9 @@
-ALOJANDO SERVIDOR NODE CON APACHER
+
+Instalar dependencias
+	npm install
+
+Correr serivor
+	nodejs server.js
 
 
-sittio virtual testApache2WithNodejs.conf
-
-
-port : 3000
+REQUIERE MONGODB

@@ -16,7 +16,7 @@ const Siteweb = function(id, site, tag_title, tag_link, tag_date, request_body, 
 
 	this.prev_request_body =  "" 
 	// eventos
-
+ 
 
 	this.set_id = (new_id) => this.id = new_id
 	this.add_entrada = (entrada) => {this.entradas.push(entrada)}
@@ -75,13 +75,27 @@ const Siteweb = function(id, site, tag_title, tag_link, tag_date, request_body, 
   		var title = $(_this.tag_title).first().text();
 		var link = $(_this.tag_link).first().attr("href")
 		var date = $(_this.tag_date).first().text()
+		console.log("Nueva entrada",link, this.site)
+		//let p = link[0] == "/" ? this.site + link:link;
+		//console.log(this.site, p )
 		let entrada = {
 			id_site : this.id,
 			title : title,
-			link : link,
+			//link : link[0] == "/" ? this.site + link : link,
 			date : date
 		}
 		return entrada
+	}
+	
+	this.generateurl = (url) => { 
+		if (url) {
+			if (url[0] == "/"){
+				let  new_url = this.site + url
+				return new_url
+			}
+			
+		}
+		return url
 	}
 	this.last_entrada = ()=> {
 
@@ -90,7 +104,7 @@ const Siteweb = function(id, site, tag_title, tag_link, tag_date, request_body, 
 		
 	}
 	this.generate_all_entrada = () => {
-		console.log("Busca Todas entradas")
+		//console.log("Busca Todas entradas")
 		var _this = this
 		var id = this.id
 		var promise = new Promise(function(resolve, reeject){
@@ -118,7 +132,7 @@ const Siteweb = function(id, site, tag_title, tag_link, tag_date, request_body, 
 				var new_entrada ={
 					id_site : id,
 					title : array_title[array_title.length-i],
-					link : array_link_article[array_link_article.length-i],
+					link : array_link_article[array_link_article.length-i][0] == "/" ? _this.site+array_link_article[array_link_article.length-i] : array_link_article[array_link_article.length-i],
 					date :array_date[array_date.length-i]
 				}
 				_this.entradas.push(new_entrada)

@@ -22,7 +22,7 @@ module.exports = function(io, Blogs){
 		socket.emit("mensaje", {hola: "jonatan"})
 
 		socket.on("datos_sitio_web", function(data){
-			
+			console.log("Datos nuevo sitio", data)
 			new_sitio = ""
 			new_sitio = new Siteweb( 0 , data.site, data.tag_title, data.tag_link, data.tag_date)
 

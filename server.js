@@ -43,9 +43,12 @@ app.get("/", function(res, res, next){
 app.get("/search/:id", function(req, res, next){
 	var id = req.params.id
 	var blog = blogs.search_id(id)
-	console.log(blog)
-	var entradas = blog.get_entradas()
-	res.render("search_blog",{entradas:entradas})
+	var entradas = blog.get_entradas();
+	console.log("Entrada ejemplo", entradas[0])
+	console.log("Buscando el blog", blog.site)
+	let site = blog.site;
+	
+	res.render("search_blog",{entradas:entradas, site:site})
 	//res.json(entradas)
 })
 
@@ -62,7 +65,7 @@ app.get("/nuevos", function (req, res, next) {
 	var nuevos = blogs.nuevos()
 	funciones.guardar_nuevos(blogs)
 	res.render('addblog')
-	console.log(nuevos)
+	//console.log(nuevos)
 
 })
 app.get("/ver", function(req, res, next){
